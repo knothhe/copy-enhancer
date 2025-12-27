@@ -11,7 +11,7 @@ A browser extension that adds quick copy buttons to posts on X.com, Twitter, and
 - **Auto-injection** - Buttons automatically appear on dynamically loaded tweets
 
 ### For linux.do
-- **Copy with Link** - Copies post content and URL with #linux.do hashtag
+- **Copy with Link** - Copies post content and URL with #Linuxdo hashtag
 - **Copy Text Only** - Copies just the post text content
 - **Visual Feedback** - Toast notification confirms successful copy
 - **Auto-injection** - Buttons automatically appear on dynamically loaded posts
@@ -31,7 +31,7 @@ The extension adds two copy buttons to the action bar below each tweet:
 The extension adds two copy buttons below each forum post:
 
 1. 🔗 **Copy with Link** - Copies with link
-   - Format: `Post content` + `Post URL` + `#linux.do`
+   - Format: `Post content` + `Post URL` + `#Linuxdo`
 
 2. 📄 **Copy Text** - Copies text only
    - Format: Just the post text

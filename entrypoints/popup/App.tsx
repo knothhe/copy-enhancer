@@ -56,7 +56,7 @@ function App() {
                 </div>
                 <div className="feature-text">
                   <h3>Copy with Link</h3>
-                  <p>Post + URL + #linux.do</p>
+                  <p>Post + URL + #Linuxdo</p>
                 </div>
               </div>
 
