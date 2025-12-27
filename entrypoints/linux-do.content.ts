@@ -73,118 +73,63 @@ export default defineContentScript({
         return;
       }
 
-      // Try to find existing buttons to insert after them
-      const existingButtons = post.querySelectorAll('button, .btn, [role="button"]');
-
-      if (existingButtons.length > 0) {
-        // Get the last button and insert our buttons after it
-        const lastButton = existingButtons[existingButtons.length - 1];
-
-        // Create first button
-        const copyWithLinkBtn = document.createElement('button');
-        copyWithLinkBtn.className = 'widget-button btn-flat linux-do-copy-btn';
-        copyWithLinkBtn.innerHTML = copyWithLinkIcon;
-        copyWithLinkBtn.title = 'Copy post with link';
-        copyWithLinkBtn.type = 'button';
-
-        // Create second button
-        const copyTextOnlyBtn = document.createElement('button');
-        copyTextOnlyBtn.className = 'widget-button btn-flat linux-do-copy-btn';
-        copyTextOnlyBtn.innerHTML = copyTextOnlyIcon;
-        copyTextOnlyBtn.title = 'Copy post text only';
-        copyTextOnlyBtn.type = 'button';
-
-        // Add click handlers
-        copyWithLinkBtn.addEventListener('click', async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-
-          const postText = getPostText(post);
-          const postUrl = getPostUrl(post);
-
-          if (postText && postUrl) {
-            const copyText = `${postText}\n${postUrl}\n#Linuxdo`;
-            await copyToClipboard(copyText);
-            showToast('Copied with link!');
-          } else {
-            showToast('Failed to copy');
-          }
-        });
-
-        copyTextOnlyBtn.addEventListener('click', async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-
-          const postText = getPostText(post);
-
-          if (postText) {
-            const success = await copyToClipboard(postText);
-            if (success) {
-              showToast('Copied text!');
-            }
-          }
-        });
-
-        // Insert after the last button
-        if (lastButton.parentNode) {
-          lastButton.parentNode.insertBefore(copyWithLinkBtn, lastButton.nextSibling);
-          lastButton.parentNode.insertBefore(copyTextOnlyBtn, copyWithLinkBtn.nextSibling);
-        }
-      } else {
-        // Fallback: No existing buttons found, try to append to post info area
-        const postInfo = post.querySelector('.post-info');
-        if (postInfo) {
-          const container = document.createElement('span');
-          container.className = 'linux-do-copy-buttons-container';
-
-          const copyWithLinkBtn = document.createElement('button');
-          copyWithLinkBtn.className = 'widget-button btn-flat linux-do-copy-btn';
-          copyWithLinkBtn.innerHTML = copyWithLinkIcon;
-          copyWithLinkBtn.title = 'Copy post with link';
-          copyWithLinkBtn.type = 'button';
-
-          const copyTextOnlyBtn = document.createElement('button');
-          copyTextOnlyBtn.className = 'widget-button btn-flat linux-do-copy-btn';
-          copyTextOnlyBtn.innerHTML = copyTextOnlyIcon;
-          copyTextOnlyBtn.title = 'Copy post text only';
-          copyTextOnlyBtn.type = 'button';
-
-          // Add click handlers
-          copyWithLinkBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            const postText = getPostText(post);
-            const postUrl = getPostUrl(post);
-
-            if (postText && postUrl) {
-              const copyText = `${postText}\n${postUrl}\n#Linuxdo`;
-              await copyToClipboard(copyText);
-              showToast('Copied with link!');
-            } else {
-              showToast('Failed to copy');
-            }
-          });
-
-          copyTextOnlyBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            const postText = getPostText(post);
-
-            if (postText) {
-              const success = await copyToClipboard(postText);
-              if (success) {
-                showToast('Copied text!');
-              }
-            }
-          });
-
-          container.appendChild(copyWithLinkBtn);
-          container.appendChild(copyTextOnlyBtn);
-          postInfo.appendChild(container);
-        }
+      // Find the post-controls container
+      const controls = post.querySelector('.post-controls');
+      if (!controls) {
+        return;
       }
+
+      // Find the like button to insert before it
+      const likeButton = controls.querySelector('.widget-button.like, .like-count');
+
+      // Create first button (copy text only)
+      const copyTextOnlyBtn = document.createElement('button');
+      copyTextOnlyBtn.className = 'widget-button btn-flat linux-do-copy-btn';
+      copyTextOnlyBtn.innerHTML = copyTextOnlyIcon;
+      copyTextOnlyBtn.title = 'Copy post text only';
+      copyTextOnlyBtn.type = 'button';
+
+      // Create second button (copy with link)
+      const copyWithLinkBtn = document.createElement('button');
+      copyWithLinkBtn.className = 'widget-button btn-flat linux-do-copy-btn';
+      copyWithLinkBtn.innerHTML = copyWithLinkIcon;
+      copyWithLinkBtn.title = 'Copy post with link';
+      copyWithLinkBtn.type = 'button';
+
+      // Add click handlers
+      copyTextOnlyBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const postText = getPostText(post);
+
+        if (postText) {
+          const success = await copyToClipboard(postText);
+          if (success) {
+            showToast('Copied text!');
+          }
+        }
+      });
+
+      copyWithLinkBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const postText = getPostText(post);
+        const postUrl = getPostUrl(post);
+
+        if (postText && postUrl) {
+          const copyText = `${postText}\n${postUrl}\n#Linuxdo`;
+          await copyToClipboard(copyText);
+          showToast('Copied with link!');
+        } else {
+          showToast('Failed to copy');
+        }
+      });
+
+      // Insert at the end of controls (so they appear on the right)
+      controls.appendChild(copyTextOnlyBtn);
+      controls.appendChild(copyWithLinkBtn);
     }
 
     function getPostText(post: Element): string | null {
