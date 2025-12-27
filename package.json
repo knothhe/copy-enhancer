@@ -1,6 +1,6 @@
 {
-  "name": "x-copy-enhancer",
-  "description": "Enhance your X.com experience with quick tweet copying",
+  "name": "copy-enhancer",
+  "description": "Quick copy buttons for X.com, Twitter, and linux.do",
   "private": true,
   "version": "0.0.0",
   "type": "module",

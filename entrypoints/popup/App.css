@@ -1,6 +1,6 @@
 .popup-container {
-  width: 380px;
-  min-height: 400px;
+  width: 400px;
+  min-height: 450px;
   background: #ffffff;
   color: #0f1419;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -30,22 +30,39 @@
 }
 
 .content {
-  padding: 24px;
+  padding: 20px;
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 .description {
-  margin: 0 0 24px 0;
+  margin: 0 0 20px 0;
   font-size: 15px;
   color: #536471;
   text-align: center;
   line-height: 1.5;
 }
 
+.platforms {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.platform-section h2 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f1419;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #eff3f4;
+}
+
 .features {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 28px;
+  gap: 12px;
 }
 
 .feature-item {
@@ -72,6 +89,10 @@
   align-items: center;
   justify-content: center;
   fill: white;
+}
+
+.feature-icon.linux-icon {
+  background: #e6b422;
 }
 
 .feature-icon svg {
@@ -172,6 +193,11 @@
 
   .feature-text p {
     color: #8b98a5;
+  }
+
+  .platform-section h2 {
+    color: #f7f9f9;
+    border-bottom-color: #38444d;
   }
 
   .usage {

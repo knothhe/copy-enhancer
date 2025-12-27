@@ -1,17 +1,24 @@
-# X Copy Enhancer
+# Copy Enhancer
 
-A browser extension that enhances your X.com (Twitter) experience by adding quick copy buttons to every tweet.
+A browser extension that adds quick copy buttons to posts on X.com, Twitter, and linux.do.
 
 ## Features
 
+### For X.com / Twitter
 - **Copy with Link** - Copies tweet content, URL, and #X hashtag in one click
 - **Copy Text Only** - Copies just the tweet text content
 - **Visual Feedback** - Toast notification confirms successful copy
 - **Auto-injection** - Buttons automatically appear on dynamically loaded tweets
-- **Multi-platform** - Works on both x.com and twitter.com
+
+### For linux.do
+- **Copy with Link** - Copies post content and URL with #linux.do hashtag
+- **Copy Text Only** - Copies just the post text content
+- **Visual Feedback** - Toast notification confirms successful copy
+- **Auto-injection** - Buttons automatically appear on dynamically loaded posts
 
 ## How It Works
 
+### On X.com / Twitter
 The extension adds two copy buttons to the action bar below each tweet:
 
 1. 🔗 **Link Icon** - Copies with link
@@ -19,6 +26,15 @@ The extension adds two copy buttons to the action bar below each tweet:
 
 2. 📄 **Document Icon** - Copies text only
    - Format: Just the tweet text
+
+### On linux.do
+The extension adds two copy buttons below each forum post:
+
+1. 🔗 **Copy with Link** - Copies with link
+   - Format: `Post content` + `Post URL` + `#linux.do`
+
+2. 📄 **Copy Text** - Copies text only
+   - Format: Just the post text
 
 ## Installation
 
