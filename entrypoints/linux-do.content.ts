@@ -162,26 +162,46 @@ export default defineContentScript({
     }
 
     function getPostUrl(post: Element): string | null {
+      let url: string | null = null;
+
       // Try to find the post link
       const postLink = post.querySelector('a[data-post-number]');
       if (postLink) {
         const href = postLink.getAttribute('href');
         if (href) {
-          return href.startsWith('/') ? `${window.location.origin}${href}` : href;
+          url = href.startsWith('/') ? `${window.location.origin}${href}` : href;
         }
       }
 
       // Alternative: try to find any link with post number
-      const links = post.querySelectorAll('a');
-      for (const link of links) {
-        const href = link.getAttribute('href');
-        if (href && (href.includes('/p/') || href.includes('/t/'))) {
-          return href.startsWith('/') ? `${window.location.origin}${href}` : href;
+      if (!url) {
+        const links = post.querySelectorAll('a');
+        for (const link of links) {
+          const href = link.getAttribute('href');
+          if (href && (href.includes('/p/') || href.includes('/t/'))) {
+            url = href.startsWith('/') ? `${window.location.origin}${href}` : href;
+            break;
+          }
         }
       }
 
       // Fallback: use current page URL
-      return window.location.href;
+      if (!url) {
+        url = window.location.href;
+      }
+
+      // Remove ?u parameter from URL
+      if (url) {
+        try {
+          const urlObj = new URL(url);
+          urlObj.searchParams.delete('u');
+          url = urlObj.toString();
+        } catch {
+          // If URL parsing fails, return as is
+        }
+      }
+
+      return url;
     }
 
     async function copyToClipboard(text: string): Promise<boolean> {
