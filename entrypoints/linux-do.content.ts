@@ -5,11 +5,18 @@ export default defineContentScript({
     const style = document.createElement('style');
     style.textContent = `
       .linux-do-copy-btn {
-        opacity: 0.6;
-        transition: opacity 0.2s;
+        color: #6d6d6d !important;
       }
-      .linux-do-copy-btn:hover {
-        opacity: 1;
+      .linux-do-copy-btn svg {
+        width: 18px;
+        height: 18px;
+        display: block;
+        fill: #6d6d6d;
+      }
+      .linux-do-copy-buttons-container {
+        display: inline-flex;
+        gap: 4px;
+        margin-left: 8px;
       }
       .linux-do-tooltip {
         position: fixed;
@@ -96,11 +103,11 @@ export default defineContentScript({
           const postUrl = getPostUrl(post);
 
           if (postText && postUrl) {
-            const copyText = `${postText}\n${postUrl}\n#linux.do`;
-            const success = await copyToClipboard(copyText);
-            if (success) {
-              showToast('Copied with link!');
-            }
+            const copyText = `${postText}\n${postUrl}\n#Linuxdo`;
+            await copyToClipboard(copyText);
+            showToast('Copied with link!');
+          } else {
+            showToast('Failed to copy');
           }
         });
 
@@ -123,6 +130,60 @@ export default defineContentScript({
           lastButton.parentNode.insertBefore(copyWithLinkBtn, lastButton.nextSibling);
           lastButton.parentNode.insertBefore(copyTextOnlyBtn, copyWithLinkBtn.nextSibling);
         }
+      } else {
+        // Fallback: No existing buttons found, try to append to post info area
+        const postInfo = post.querySelector('.post-info');
+        if (postInfo) {
+          const container = document.createElement('span');
+          container.className = 'linux-do-copy-buttons-container';
+
+          const copyWithLinkBtn = document.createElement('button');
+          copyWithLinkBtn.className = 'widget-button btn-flat linux-do-copy-btn';
+          copyWithLinkBtn.innerHTML = copyWithLinkIcon;
+          copyWithLinkBtn.title = 'Copy post with link';
+          copyWithLinkBtn.type = 'button';
+
+          const copyTextOnlyBtn = document.createElement('button');
+          copyTextOnlyBtn.className = 'widget-button btn-flat linux-do-copy-btn';
+          copyTextOnlyBtn.innerHTML = copyTextOnlyIcon;
+          copyTextOnlyBtn.title = 'Copy post text only';
+          copyTextOnlyBtn.type = 'button';
+
+          // Add click handlers
+          copyWithLinkBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const postText = getPostText(post);
+            const postUrl = getPostUrl(post);
+
+            if (postText && postUrl) {
+              const copyText = `${postText}\n${postUrl}\n#Linuxdo`;
+              await copyToClipboard(copyText);
+              showToast('Copied with link!');
+            } else {
+              showToast('Failed to copy');
+            }
+          });
+
+          copyTextOnlyBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const postText = getPostText(post);
+
+            if (postText) {
+              const success = await copyToClipboard(postText);
+              if (success) {
+                showToast('Copied text!');
+              }
+            }
+          });
+
+          container.appendChild(copyWithLinkBtn);
+          container.appendChild(copyTextOnlyBtn);
+          postInfo.appendChild(container);
+        }
       }
     }
 
@@ -140,8 +201,16 @@ export default defineContentScript({
         if (content) {
           let text = content.textContent?.trim() || '';
           text = text.replace(/\s+/g, ' ').trim();
-          return text;
+          if (text.length > 0) {
+            return text;
+          }
         }
+      }
+
+      // Last resort: get text from post itself
+      const text = post.textContent?.trim() || '';
+      if (text.length > 0) {
+        return text.replace(/\s+/g, ' ').trim();
       }
 
       return null;
@@ -161,24 +230,13 @@ export default defineContentScript({
       const links = post.querySelectorAll('a');
       for (const link of links) {
         const href = link.getAttribute('href');
-        if (href && href.includes('/p/')) {
+        if (href && (href.includes('/p/') || href.includes('/t/'))) {
           return href.startsWith('/') ? `${window.location.origin}${href}` : href;
         }
       }
 
-      // Fallback: construct URL from data attributes
-      const postNumber = post.getAttribute('data-post-number');
-      const topicId = post.getAttribute('data-topic-id');
-      if (postNumber && topicId) {
-        return `${window.location.origin}/t/${topicId}/${postNumber}`;
-      }
-
-      // Last resort: use window.location.pathname with post number
-      if (postNumber) {
-        return `${window.location.pathname}/${postNumber}`;
-      }
-
-      return null;
+      // Fallback: use current page URL
+      return window.location.href;
     }
 
     async function copyToClipboard(text: string): Promise<boolean> {
