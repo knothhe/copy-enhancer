@@ -10,18 +10,27 @@ export default defineContentScript({
         cursor: pointer;
         padding: 8px;
         border-radius: 9999px;
-        transition: background-color 0.2s;
+        transition: all 0.2s ease;
         display: flex;
         align-items: center;
         justify-content: center;
       }
       .x-copy-btn:hover {
         background-color: rgba(255, 255, 255, 0.1);
+        transform: scale(1.1);
+      }
+      .x-copy-btn:active {
+        transform: scale(0.95);
+        background-color: rgba(255, 255, 255, 0.15);
       }
       .x-copy-btn svg {
         width: 18px;
         height: 18px;
         fill: currentColor;
+        transition: all 0.2s ease;
+      }
+      .x-copy-btn:hover svg {
+        filter: brightness(1.2);
       }
       .x-copy-buttons-container {
         display: flex;
