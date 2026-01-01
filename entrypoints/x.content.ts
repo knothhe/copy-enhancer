@@ -16,12 +16,10 @@ export default defineContentScript({
         justify-content: center;
       }
       .x-copy-btn:hover {
-        background-color: rgba(255, 255, 255, 0.1);
         transform: scale(1.1);
       }
       .x-copy-btn:active {
         transform: scale(0.95);
-        background-color: rgba(255, 255, 255, 0.15);
       }
       .x-copy-btn svg {
         width: 18px;
@@ -29,7 +27,24 @@ export default defineContentScript({
         fill: currentColor;
         transition: all 0.2s ease;
       }
-      .x-copy-btn:hover svg {
+      /* Light theme styles */
+      .x-copy-btn.light-theme:hover {
+        background-color: rgba(0, 0, 0, 0.08);
+      }
+      .x-copy-btn.light-theme:active {
+        background-color: rgba(0, 0, 0, 0.12);
+      }
+      .x-copy-btn.light-theme:hover svg {
+        filter: brightness(0.85);
+      }
+      /* Dark theme styles */
+      .x-copy-btn.dark-theme:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      .x-copy-btn.dark-theme:active {
+        background-color: rgba(255, 255, 255, 0.15);
+      }
+      .x-copy-btn.dark-theme:hover svg {
         filter: brightness(1.2);
       }
       .x-copy-buttons-container {
@@ -59,6 +74,29 @@ export default defineContentScript({
       }
     `;
     document.head.appendChild(style);
+
+    // Detect if page is in dark mode
+    function isDarkMode(): boolean {
+      // Check if body background is dark
+      const bodyStyle = window.getComputedStyle(document.body);
+      const bgColor = bodyStyle.backgroundColor;
+
+      // Parse RGB values
+      const rgbMatch = bgColor.match(/\d+/g);
+      if (rgbMatch && rgbMatch.length >= 3) {
+        const [, g, b] = rgbMatch.map(Number);
+        // Calculate luminance
+        const luminance = (0.299 * rgbMatch[0] + 0.587 * g + 0.114 * b) / 255;
+        return luminance < 0.5;
+      }
+
+      return false;
+    }
+
+    // Get theme class name
+    function getThemeClass(): string {
+      return isDarkMode() ? 'dark-theme' : 'light-theme';
+    }
 
     // Create toast notification element
     const toast = document.createElement('div');
@@ -94,20 +132,23 @@ export default defineContentScript({
       const actionBar = tweet.querySelector('[role="group"]');
       if (!actionBar) return;
 
+      // Get current theme class
+      const themeClass = getThemeClass();
+
       // Create buttons container
       const buttonsContainer = document.createElement('div');
       buttonsContainer.className = 'x-copy-buttons-container';
 
       // Create "Copy with Link" button
       const copyWithLinkBtn = document.createElement('button');
-      copyWithLinkBtn.className = 'x-copy-btn';
+      copyWithLinkBtn.className = `x-copy-btn ${themeClass}`;
       copyWithLinkBtn.innerHTML = copyWithLinkIcon;
       copyWithLinkBtn.title = 'Copy tweet with link';
       copyWithLinkBtn.setAttribute('aria-label', 'Copy tweet with link');
 
       // Create "Copy Text Only" button
       const copyTextOnlyBtn = document.createElement('button');
-      copyTextOnlyBtn.className = 'x-copy-btn';
+      copyTextOnlyBtn.className = `x-copy-btn ${themeClass}`;
       copyTextOnlyBtn.innerHTML = copyTextOnlyIcon;
       copyTextOnlyBtn.title = 'Copy tweet text only';
       copyTextOnlyBtn.setAttribute('aria-label', 'Copy tweet text only');
@@ -252,6 +293,25 @@ export default defineContentScript({
     observer.observe(document.body, {
       childList: true,
       subtree: true
+    });
+
+    // Watch for theme changes
+    const themeObserver = new MutationObserver(() => {
+      const newThemeClass = getThemeClass();
+      document.querySelectorAll('.x-copy-btn').forEach(btn => {
+        btn.classList.remove('light-theme', 'dark-theme');
+        btn.classList.add(newThemeClass);
+      });
+    });
+
+    // Observe body attribute changes for theme switching
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class', 'style']
     });
 
     console.log('X Copy Enhancer: Content script loaded');
