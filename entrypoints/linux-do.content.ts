@@ -84,14 +84,14 @@ export default defineContentScript({
 
       // Create first button (copy text only)
       const copyTextOnlyBtn = document.createElement('button');
-      copyTextOnlyBtn.className = 'widget-button btn-flat linux-do-copy-btn';
+      copyTextOnlyBtn.className = 'widget-button btn-flat linux-do-copy-btn btn';
       copyTextOnlyBtn.innerHTML = copyTextOnlyIcon;
       copyTextOnlyBtn.title = 'Copy post text only';
       copyTextOnlyBtn.type = 'button';
 
       // Create second button (copy with link)
       const copyWithLinkBtn = document.createElement('button');
-      copyWithLinkBtn.className = 'widget-button btn-flat linux-do-copy-btn';
+      copyWithLinkBtn.className = 'widget-button btn-flat linux-do-copy-btn btn';
       copyWithLinkBtn.innerHTML = copyWithLinkIcon;
       copyWithLinkBtn.title = 'Copy post with link';
       copyWithLinkBtn.type = 'button';
